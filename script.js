@@ -1,8 +1,9 @@
+const lineWidth = document.getElementById("line-width");
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d"); // the "paint-brush" of the canvas
 canvas.width = 800;
 canvas.height = 800;
-ctx.lineWidth = 2;
+ctx.lineWidth = lineWidth.value;
 
 let isPainting = false;
 
@@ -12,6 +13,7 @@ function onMove(e) {
     ctx.stroke();
     return;
   }
+  ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
 }
 
@@ -23,7 +25,13 @@ function cancelPainting() {
   isPainting = false;
 }
 
+function onLineWidthChange(e) {
+  ctx.lineWidth = e.target.value;
+}
+
 canvas.addEventListener("mousemove", onMove);
 canvas.addEventListener("mousedown", startPainting);
 canvas.addEventListener("mouseup", cancelPainting);
 canvas.addEventListener("mouseleave", cancelPainting);
+
+lineWidth.addEventListener("change", onLineWidthChange);
