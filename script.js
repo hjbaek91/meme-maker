@@ -1,19 +1,20 @@
 const saveBtn = document.getElementById("save");
 const textInput = document.getElementById("text");
 const fileInput = document.getElementById("file");
-const modeBtn = document.getElementById("mode-btn");
-const resetBtn = document.getElementById("reset-btn");
 const eraserBtn = document.getElementById("eraser-btn");
+const destroyBtn = document.getElementById("destroy-btn");
+const modeBtn = document.getElementById("mode-btn");
 const colorOptions = Array.from(
   document.getElementsByClassName("color-option")
 );
 const color = document.getElementById("color");
 const lineWidth = document.getElementById("line-width");
+const fontSize = document.getElementById("font-size");
 const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d"); // the "paint-brush" of the canvas
+const ctx = canvas.getContext("2d");
 
-const CANVAS_WIDTH = 800;
-const CANVAS_HEIGHT = 800;
+const CANVAS_WIDTH = 550;
+const CANVAS_HEIGHT = 550;
 
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
@@ -22,35 +23,33 @@ ctx.lineCap = "round";
 let isPainting = false;
 let isFilling = false;
 
-function onMove(e) {
+function onMove(event) {
   if (isPainting) {
-    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.lineTo(event.offsetX, event.offsetY);
     ctx.stroke();
     return;
   }
-  ctx.beginPath();
-  ctx.moveTo(e.offsetX, e.offsetY);
+  ctx.moveTo(event.offsetX, event.offsetY);
 }
-
 function startPainting() {
   isPainting = true;
 }
-
 function cancelPainting() {
   isPainting = false;
+  // ctx.fill();
+  ctx.beginPath();
+}
+function onLineWidthChange(event) {
+  ctx.lineWidth = event.target.value;
 }
 
-function onLineWidthChange(e) {
-  ctx.lineWidth = e.target.value;
+function onColorChange(event) {
+  ctx.strokeStyle = event.target.value;
+  ctx.fillStyle = event.target.value;
 }
 
-function onColorChange(e) {
-  ctx.strokeStyle = e.target.value;
-  ctx.fillStyle = e.target.value;
-}
-
-function onColorClick(e) {
-  const colorValue = e.target.dataset.color;
+function onColorClick(event) {
+  const colorValue = event.target.dataset.color;
   ctx.strokeStyle = colorValue;
   ctx.fillStyle = colorValue;
   color.value = colorValue;
@@ -66,25 +65,25 @@ function onModeClick() {
   }
 }
 
-function onCanvusClick() {
+function onCanvasClick() {
   if (isFilling) {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 }
 
-function onResetClick() {
-  ctx.fillStyle = "#fff";
+function onDestroyClick() {
+  ctx.fillStyle = "white";
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 function onEraserClick() {
-  ctx.strokeStyle = "#fff";
+  ctx.strokeStyle = "white";
   isFilling = false;
   modeBtn.innerText = "Fill";
 }
 
-function onFileChange(e) {
-  const file = e.target.files[0];
+function onFileChange(event) {
+  const file = event.target.files[0];
   const url = URL.createObjectURL(file);
   const image = new Image();
   image.src = url;
@@ -94,13 +93,13 @@ function onFileChange(e) {
   };
 }
 
-function onDoubleClick(e) {
+function onDoubleClick(event) {
   const text = textInput.value;
   if (text !== "") {
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.font = "68px serif";
-    ctx.fillText(text, e.offsetX, e.offsetY);
+    ctx.font = "sans-serif";
+    ctx.fillText(text, event.offsetX, event.offsetY);
     ctx.restore();
   }
 }
@@ -113,21 +112,22 @@ function onSaveClick() {
   a.click();
 }
 
+function onFontSizeChange(event) {
+  ctx.font = `${event.target.value}px sans-serif`;
+}
+
 canvas.addEventListener("dblclick", onDoubleClick);
 canvas.addEventListener("mousemove", onMove);
 canvas.addEventListener("mousedown", startPainting);
 canvas.addEventListener("mouseup", cancelPainting);
 canvas.addEventListener("mouseleave", cancelPainting);
-canvas.addEventListener("click", onCanvusClick);
-
+canvas.addEventListener("click", onCanvasClick);
 lineWidth.addEventListener("change", onLineWidthChange);
 color.addEventListener("change", onColorChange);
-
 colorOptions.forEach((color) => color.addEventListener("click", onColorClick));
-
 modeBtn.addEventListener("click", onModeClick);
-resetBtn.addEventListener("click", onResetClick);
+destroyBtn.addEventListener("click", onDestroyClick);
 eraserBtn.addEventListener("click", onEraserClick);
-
 fileInput.addEventListener("change", onFileChange);
 saveBtn.addEventListener("click", onSaveClick);
+fontSize.addEventListener("change", onFontSizeChange);
